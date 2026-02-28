@@ -1,0 +1,22 @@
+@use "./variables" as v;
+
+// tablet
+@mixin tablet {
+    @media (min-width: v.$tablet) {
+        @content;
+    }
+}
+
+// Laptop
+@mixin laptop {
+  @media (min-width: v.$laptop) {
+    @content;
+  }
+}
+
+//Desktop
+@mixin desktop {
+  @media (min-width: v.$desktop) {
+    @content;
+  }
+}

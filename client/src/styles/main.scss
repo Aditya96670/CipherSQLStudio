@@ -1,0 +1,11 @@
+@use "./base/variables" as v;
+@use "./base/mixins" ;
+@use "./base/reset";
+@use "./pages/assignments";
+@use "./pages/detail";
+
+
+body {
+  font-family: system-ui, sans-serif;
+  color: v.$text;
+}
