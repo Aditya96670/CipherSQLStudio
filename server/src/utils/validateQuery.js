@@ -5,14 +5,14 @@ export const validateQuery = (query) => {
 
   const trimmedQuery = query.trim();
 
-  // 1️⃣ Multiple statements block
+  
   if (trimmedQuery.split(";").length > 2) {
     return { valid: false, message: "Multiple statements are not allowed" };
   }
 
   const upperQuery = trimmedQuery.toUpperCase();
 
-  // 2️⃣ Allowed starting keywords
+ 
   const allowedStart = ["SELECT", "WITH", "SHOW"];
 
   const startsCorrectly = allowedStart.some(keyword =>
@@ -23,7 +23,7 @@ export const validateQuery = (query) => {
     return { valid: false, message: "Only read-only queries are allowed" };
   }
 
-  // 3️⃣ Dangerous keywords block
+  
   const forbiddenKeywords = [
     "DROP",
     "DELETE",
