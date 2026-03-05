@@ -3,7 +3,7 @@ import pool from "../config/db.js";
 export const getAllAssignments = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, title, description, difficulty FROM assignments"
+      "SELECT id, title, description, difficulty, target_table, hint FROM assignments ORDER BY id ASC"
     );
 
     res.json(result.rows);
@@ -17,7 +17,7 @@ export const getAssignmentById = async (req, res) => {
     const { id } = req.params;
 
     const result = await pool.query(
-      "SELECT * FROM assignments WHERE id = $1",
+      "SELECT id, title, description, difficulty, target_table, hint FROM assignments WHERE id = $1",
       [id]
     );
 

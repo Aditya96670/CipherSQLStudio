@@ -1,4 +1,5 @@
 import express from "express";
+import pool from "../config/db.js";
 import {
   getAllAssignments,
   getAssignmentById
@@ -11,32 +12,52 @@ router.get("/assignments/:id/sample-data", async (req, res) => {
   try {
     const { id } = req.params;
 
+    // 1. Get the target table for this assignment
+    const assignmentRes = await pool.query(
+      "SELECT target_table FROM assignments WHERE id = $1",
+      [id]
+    );
 
-    const sampleData = {
-      schema: [
-        { column: "id", type: "integer" },
-        { column: "name", type: "text" },
-        { column: "age", type: "integer" },
-        { column: "grade", type: "text" },
-      ],
-      rows: [
-        { id: 1, name: "Aditya", age: 20, grade: "A" },
-        { id: 2, name: "Neeraj", age: 21, grade: "B" },
-        { id: 3, name: "Yukti", age: 19, grade: "A" },
-      ],
-    };
+    if (assignmentRes.rows.length === 0) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
 
-    res.json(sampleData);
+    const tableName = assignmentRes.rows[0].target_table || 'students';
+
+    // 2. Fetch schema
+    const schemaRes = await pool.query(`
+      SELECT column_name as column, data_type as type 
+      FROM information_schema.columns 
+      WHERE table_name = $1
+    `, [tableName]);
+
+    // 3. Fetch sample rows (first 3)
+    const rowsRes = await pool.query(`SELECT * FROM ${tableName} LIMIT 3`);
+
+    res.json({
+      schema: schemaRes.rows,
+      rows: rowsRes.rows
+    });
 
   } catch (error) {
+    console.error("Sample Data Error:", error);
     res.status(500).json({ message: error.message });
   }
 });
 
 router.post("/assignments/:id/hint", async (req, res) => {
   try {
+    const { id } = req.params;
     const { description } = req.body;
 
+    // 1. Check if hint exists in database
+    const dbRes = await pool.query("SELECT hint FROM assignments WHERE id = $1", [id]);
+
+    if (dbRes.rows[0]?.hint) {
+      return res.json({ hint: dbRes.rows[0].hint });
+    }
+
+    // 2. Fallback to Gemini if no hint in DB
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
       {
@@ -51,18 +72,9 @@ router.post("/assignments/:id/hint", async (req, res) => {
               parts: [
                 {
                   text: `
-You are a SQL tutor.
-
-Give a short hint (NOT full solution).
-
-Question:
-${description}
-
-Rules:
-- Do NOT provide full SQL query
-- Only guidance
-- Max 3 lines
-`,
+You are a SQL tutor. Give a short hint (NOT full solution).
+Question: ${description}
+Rules: Do NOT provide full SQL query. Max 3 lines.`,
                 },
               ],
             },
@@ -72,22 +84,12 @@ Rules:
     );
 
     const data = await response.json();
-
-    console.log("Gemini Response:", JSON.stringify(data, null, 2));
-
-    if (data.error) {
-      return res.status(500).json({ message: data.error.message });
-    }
-
-    const hint =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No hint generated.";
-
+    const hint = data.candidates?.[0]?.content?.parts?.[0]?.text || "No hint generated.";
     res.json({ hint });
 
   } catch (error) {
-    console.error("Gemini Error:", error);
-    res.status(500).json({ message: "LLM error" });
+    console.error("Hint Error:", error);
+    res.status(500).json({ message: "Error fetching hint" });
   }
 });
 

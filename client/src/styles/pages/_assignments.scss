@@ -2,57 +2,275 @@
 @use "../base/mixins" as m;
 
 .assignments {
-  padding: v.$spacing-md;
+  min-height: 100vh;
+  background-color: v.$background;
+  padding-bottom: v.$spacing-xl;
 
-  &__title {
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 v.$spacing-lg;
+    transform: translateY(-40px);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: v.$spacing-lg;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__list-title {
     font-size: 1.5rem;
-    margin-bottom: v.$spacing-md;
+    font-weight: 700;
+    color: v.$secondary;
+    margin: 0;
+  }
+
+  &__stats {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  &__count,
+  &__remaining {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: v.$radius-full;
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__count {
+    background: v.$secondary;
+    color: v.$white;
+  }
+
+  &__remaining {
+    background: #fdf2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
   }
 
   &__list {
-    display: flex;
-    flex-direction: column;
-    gap: v.$spacing-md;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-lg;
 
     @include m.tablet {
-      flex-direction: row;
-      flex-wrap: wrap;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.laptop {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 }
 
-.assignment-card {
-  display: block;              // IMPORTANT (for Link)
-  text-decoration: none;       // remove underline
-  color: inherit;              // remove blue color
+.assignments-hero {
+  position: relative;
+  background: v.$secondary;
+  padding: 80px 0 120px;
+  text-align: center;
+  overflow: hidden;
 
-  background: v.$white;
-  border: 1px solid v.$border;
-  padding: v.$spacing-md;
-  border-radius: v.$radius-md;
-  transition: 0.2s ease;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  &__content {
+    position: relative;
+    z-index: 10;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 v.$spacing-lg;
   }
 
   &__title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: v.$white;
+    margin-bottom: v.$spacing-md;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &__subtitle {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  &__gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.assignment-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  background: v.$glass-bg;
+  backdrop-filter: v.$glass-blur;
+  border: 1px solid v.$glass-border;
+  padding: v.$spacing-lg;
+  border-radius: v.$radius-lg;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: v.$shadow-sm;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: v.$primary;
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: v.$shadow-lg;
+    background: v.$white;
+    border-color: transparent;
+
+    &::before {
+      width: 8px;
+    }
+
+    & .assignment-card__action {
+      transform: translateX(4px);
+      color: v.$primary;
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
     margin-bottom: v.$spacing-sm;
   }
 
+  &__status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.625rem;
+    font-weight: 800;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 2px 8px;
+    border-radius: v.$radius-full;
+    border: 1px solid #10b981;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+    margin-bottom: v.$spacing-lg;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: v.$secondary;
+    margin: 0;
+  }
+
   &__description {
-    font-size: 0.9rem;
-    color: v.$text-light;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: v.$text-muted;
+    margin-top: v.$spacing-sm;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid v.$border;
+    padding-top: v.$spacing-md;
   }
 
   &__difficulty {
-    display: inline-block;
-    margin-top: v.$spacing-sm;
-    font-size: 0.8rem;
-    background: v.$primary;
-    color: v.$white;
-    padding: 4px 8px;
-    border-radius: v.$radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: v.$radius-full;
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: v.$primary;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  &--completed {
+    opacity: 0.9;
+
+    &::before {
+      background: #10b981 !important;
+    }
+
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  // Difficulty States
+  &--easy {
+    &::before {
+      background: v.$easy;
+    }
+
+    & .assignment-card__difficulty {
+      background: rgba(16, 185, 129, 0.1);
+      color: v.$easy;
+    }
+  }
+
+  &--medium {
+    &::before {
+      background: v.$medium;
+    }
+
+    & .assignment-card__difficulty {
+      background: rgba(245, 158, 11, 0.1);
+      color: v.$medium;
+    }
+  }
+
+  &--hard {
+    &::before {
+      background: v.$hard;
+    }
+
+    & .assignment-card__difficulty {
+      background: rgba(239, 68, 68, 0.1);
+      color: v.$hard;
+    }
   }
 }
