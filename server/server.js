@@ -5,7 +5,6 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 👇 explicitly .env path de rahe hain
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 import app from "./src/app.js";
